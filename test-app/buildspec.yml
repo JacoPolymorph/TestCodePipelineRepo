@@ -1,0 +1,45 @@
+version: 0.2
+env:
+  variables:
+    APP_NAME: "fundza-fe"
+    BUCKET_NAME: "fundza-fe"
+    TEST_RESULT_BUCKET: "fundza-fe-test-results"
+    TEST_RESULTS_URL: "http://fundza-fe-test-results.s3-website-eu-west-1.amazonaws.com/"
+    # REPORT_CHANNEL_ID: "fundza-dev-qa"
+    REPORT_CHANNEL_ID: "testchanneltoo"
+    SOURCE_REPO_BASE_URL: "https://github.com/polymorph001/fundza-fe/"
+  secrets-manager:
+    MIXPANEL_TOKEN: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:MIXPANEL_TOKEN
+    SLACK_API_TOKEN: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SLACK_API_TOKEN
+phases:
+  install:
+    commands:
+      # Install Google chrome to get access to a headless browser for testing
+      - curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+      - echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+      - apt-get -y update
+      - apt-get -y install google-chrome-stable
+      # Install Slack sdk for reporting purposes
+      - pip3 install slack_sdk
+      # Install project dependencies
+      - npm install && npm install -g @angular/cli
+      - npm run config
+  pre_build:
+    commands:
+      - python3 testing/test.py
+      - npm run sonnar 
+      - envsubst < sonar-project.template > sonar-project.properties
+      - cat sonar-project.properties
+      # - echo "Syncing test results with S3"
+      # - aws s3 sync coverage/$APP_NAME s3://$TEST_RESULT_BUCKET --delete --sse AES256
+  build:
+    commands:
+       - ls -la
+       - npm run buildDev
+  post_build:
+    commands:
+      - echo “Build process finished”
+      - ls -la
+      - cd dist/$APP_NAME
+      - aws s3 sync . s3://$BUCKET_NAME --delete --sse AES256
+      

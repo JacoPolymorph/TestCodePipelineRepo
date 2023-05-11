@@ -11,6 +11,10 @@ env:
   secrets-manager:
     MIXPANEL_TOKEN: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:MIXPANEL_TOKEN
     SLACK_API_TOKEN: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SLACK_API_TOKEN
+    SONAR_ORG: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SONAR_ORG
+    SONAR_HOST: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SONAR_HOST
+    SONAR_TOKEN: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SONAR_TOKEN
+    SONAR_PROJECT_KEY: arn:aws:secretsmanager:eu-west-1:187146799929:secret:FUNDZA_FE-AG9VXD:SONAR_PROJECT_KEY
 phases:
   install:
     commands:
@@ -30,6 +34,7 @@ phases:
       - npm run sonnar 
       - envsubst < sonar-project.template > sonar-project.properties
       - cat sonar-project.properties
+      - npm run sonar
       # - echo "Syncing test results with S3"
       # - aws s3 sync coverage/$APP_NAME s3://$TEST_RESULT_BUCKET --delete --sse AES256
   build:

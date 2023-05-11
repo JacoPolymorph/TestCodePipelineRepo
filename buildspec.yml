@@ -31,7 +31,6 @@ phases:
   pre_build:
     commands:
       - python3 testing/test.py
-      - npm run sonar 
       - envsubst < sonar-project.template > sonar-project.properties
       - cat sonar-project.properties
       - npm run sonar

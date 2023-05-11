@@ -27,11 +27,11 @@ phases:
       - pip3 install slack_sdk
       # Install project dependencies
       - npm install && npm install -g @angular/cli
-      - npm run config
+      # - npm run config
   pre_build:
     commands:
       - python3 testing/test.py
-      - npm run sonnar 
+      - npm run sonar 
       - envsubst < sonar-project.template > sonar-project.properties
       - cat sonar-project.properties
       - npm run sonar
@@ -46,5 +46,5 @@ phases:
       - echo “Build process finished”
       - ls -la
       - cd dist/$APP_NAME
-      - aws s3 sync . s3://$BUCKET_NAME --delete --sse AES256
+      # - aws s3 sync . s3://$BUCKET_NAME --delete --sse AES256
       
